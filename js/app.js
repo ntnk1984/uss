@@ -11,7 +11,10 @@ console.log(headers.get('Service-Worker-Allowed'));
   // TODO add service worker code here
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker
-             .register('service-worker.js')
-             .then(function() { console.log('Service Worker Registered'); });
+             .register('service-worker.js') 
+             .then(function() { console.log('Service Worker Registered'); })
+            .catch(function(err) {
+              console.log('ServiceWorker registration failed: ', err);
+              });
   }
 })();
