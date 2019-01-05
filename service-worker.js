@@ -32,6 +32,8 @@ self.addEventListener('install', function(e) {
   );
 });
 
+
+
 self.addEventListener('activate', function(e) {
   console.log('[ServiceWorker] Activate');
   e.waitUntil(
@@ -57,3 +59,26 @@ self.addEventListener('activate', function(e) {
   return self.clients.claim();
 });
 
+self.addEventListener('fetch', function(event) {
+  event.respondWith(caches.match(event.request).then(function(response) {
+    // caches.match() always resolves
+    // but in case of success response will have value
+    if (response !== undefined) {
+      return response;
+    } else {
+      return fetch(event.request).then(function (response) {
+        // response may be used only once
+        // we need to save clone to put one copy in cache
+        // and serve second one
+        let responseClone = response.clone();
+        
+        caches.open(dataCacheName).then(function (cache) {
+          cache.put(event.request, responseClone);
+        });
+        return response;
+      }).catch(function () {
+        return caches.match('/uss/images/jeki_chan.jpg');
+      });
+    }
+  }));
+});
